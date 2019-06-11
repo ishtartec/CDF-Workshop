@@ -29,7 +29,7 @@
   - Watching the dashboard -->
 
 
----------------
+--------------- 2019 Cloudera
 
 # Lab 1
 
@@ -55,13 +55,12 @@ NOTE: The following instructions are for using Putty. You can also use other pop
    - For the Host Name use: centos@IP_ADDRESS_OF_EC2_NODE
    - Click "Save" on the session page before logging in
 
-![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/putty-session.png)
-
+![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/putty-session.png)
 
 ### To connect from Linux/MacOSX laptop
 
 - SSH into your EC2 node using below steps:
-- Right click to download [this pem key](https://raw.githubusercontent.com/apsaltis/HDF-Workshop/master/hdf-workshop.pem)  > Save link as > save to Downloads folder
+- Right click to download [this pem key](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/hdf-workshop.pem)  > Save link as > save to Downloads folder
 - Copy pem key to ~/.ssh dir and correct permissions
     ```
     cp ~/Downloads/hdf-workshop.pem ~/.ssh/
@@ -90,8 +89,6 @@ NOTE: The following instructions are for using Putty. You can also use other pop
 
 - NiFi is installed at: /usr/hdf/current/nifi
 
-
-
 -----------------------------
 
 # Lab 2
@@ -101,7 +98,6 @@ In this lab, we will learn how to:
   - Extract the JSON elements we are interested in
   - Split the JSON into smaller fragments
   - Write the JSON to the file system
-
 
 ### Consuming RSVP Data
 
@@ -115,9 +111,8 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
 
  Our final flow for this lab will look like the following:
 
-  ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/lab1.png)
+  ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/lab1.png)
   A template for this flow can be found [here](https://raw.githubusercontent.com/apsaltis/HDF-Workshop/master/templates/HDF-Workshop_Lab1-Flow.xml)
-
 
   - Step 1: Add a ConnectWebSocket processor to the cavas
       - In case you are using a downloaded template, the ControllerService will be prepopulated. You will need to enable the ControllerService. Double-click the processor and follow the arrow next to the JettyWebSocketClient
@@ -272,7 +267,7 @@ Start the port and you will see messages being accumulated in its downstream que
 # Lab 4
 
 ## Kafka Basics
-In this lab we are going to explore creating, writing to and consuming Kafka topics. This will come in handy when we later integrate Kafka with NiFi and Streaming Analytics Manager.
+In this lab we are going to explore creating, writing to and consuming Kafka topics. This will come in handy when we later integrate Kafka with NiFi and Streaming Analytics Manager.  See:  https://kafka.apache.org/quickstart
 
 1. Creating a topic
   - Step 1: Open an SSH connection to your EC2 Node.
@@ -292,15 +287,15 @@ In this lab we are going to explore creating, writing to and consuming Kafka top
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --zookeeper localhost:2181
+    bin/kafka-topics.sh --list --bootstrap-server localhost:6667
     ````
 
 2. Testing Producers and Consumers
   - Step 1: Open a second terminal to your EC2 node and navigate to the Kafka directory
   - In one shell window connect a consumer:
-  ````
- bin/kafka-console-consumer.sh --zookeeper localhost:2181 --from-beginning --topic first-topic
-````
+    ````
+    bin/kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic first-topic --from-beginning
+    ````
 
     Note: using –from-beginning will tell the broker we want to consume from the first message in the topic. Otherwise it will be from the latest offset.
 
@@ -334,7 +329,7 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
 
   - Step 3: Create a topic using the kafka-topics.sh script
     ````
-    bin/kafka-topics.sh --zookeeper localhost:2181 --create --partitions 1 --replication-factor 1 --topic meetup_rsvp_raw
+    bin/kafka-topics.sh --create --bootstrap-server localhost:6667 --replication-factor 1 --partitions 1 --topic meetup_rsvp_raw
 
     ````
 
@@ -342,14 +337,14 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --zookeeper localhost:2181
+    bin/kafka-topics.sh --list --bootstrap-server localhost:6667
     ````
 
 2. Integrating NiFi
   - Step 1: Add a PublishKafka_1_0 processor to the canvas.
   - Step 2: Add a routing for the success relationship of the ReplaceText processor to the PublishKafka_1_0 processor added in Step 1 as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/publishkafka.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/publishkafka.png)
   - Step 3: Configure the topic and broker for the PublishKafka_1_0 processor,
   where topic is meetup_rsvp_raw and broker is demo.hortonworks.com:6667.
 
@@ -358,9 +353,8 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
 4. In a terminal window to your EC2 node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_raw```` topic:
 
     ````
-    bin/kafka-console-consumer.sh --zookeeper localhost:2181 --from-beginning --topic meetup_rsvp_raw
+    bin/kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic meetup_rsvp_raw --from-beginning
     ````
-
 
 5. Messages should now appear in the consumer window.
 
@@ -380,7 +374,7 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
 
   - Step 3: Create a topic using the kafka-topics.sh script
     ````
-    bin/kafka-topics.sh --zookeeper localhost:2181 --create --partitions 1 --replication-factor 1 --topic meetup_rsvp_avro
+    bin/kafka-topics.sh --create --bootstrap-server localhost:6667 --replication-factor 1 --partitions 1 --topic meetup_rsvp_avro
 
     ````
 
@@ -388,22 +382,22 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --zookeeper localhost:2181
+    bin/kafka-topics.sh --list --bootstrap-server localhost:6667
     ````
 
 2. Adding the Schema to the Schema Registry
   - Step 1: Open a browser and navigate to the Schema Registry UI. You can get to this from the either the ```Quick Links``` drop down in Ambari, as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/registry_quick_link.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/registry_quick_link.png)
 
     or by going to ````http://<EC2_NODE>:17788````
   - Step 2: Create Meetup RSVP Schema in the Schema Registry
     1. Click on “+” button to add new schemas. A window called “Add New Schema” will appear.
     2. Fill in the fields of the ````Add Schema Dialog```` as follows:
 
-        ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/add_schema_dialog.png)
+        ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/add_schema_dialog.png)
 
-        For the Schema Text you can download it [here](https://raw.githubusercontent.com/apsaltis/HDF-Workshop/master/meetup_rsvp.asvc) and either copy and paste it or upload the file.
+        For the Schema Text you can download it [here](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/meetup_rsvp.asvc) and either copy and paste it or upload the file.
 
         Once the schema information fields have been filled and schema uploaded, click **Save**.
 
@@ -413,13 +407,13 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
   - Step 2: Add a routing for the success relationship of the ReplaceText processor to the UpdateAttrbute processor added in Step 1.
   - Step 3: Configure the UpdateAttribute processor as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/update_attribute_schema_name.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/update_attribute_schema_name.png)
 
   - Step 4: Add a JoltTransformJSON processor to the canvas.
   - Step 5: Add a routing for the success relationship of the UpdateAttribute processor to the JoltTransformJSON processor added in Step 5.
   - Step 6: Configure the JoltTransformJSON processor as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/jolt_transform_config.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/jolt_transform_config.png)
 
     The JSON used in the 'Jolt Specification' property is as follows:
 
@@ -437,39 +431,36 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
   - Step 10: Add a routing for the success relationship of the JoltTransformJSON processor to the PublishKafkaRecord_1_0 processor added in Step 9.
   - Step 11: Configure the PublishKafkaRecord_1_0 processor to look like the following:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/publishkafka_record_configuration.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/publishkafka_record_configuration.png)
 
 
   - Step 12: When you configure the JsonTreeReader and AvroRecordSetWriter, you will first need to configure a schema registry controller service. The schema registry controller service we are going to use is the 'HWX Schema Registry', it should be configured as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/hwx_schema_registry_config.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/hwx_schema_registry_config.png)
 
   - Step 13: Configure the JsonTreeReader as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/json_tree_reader_config.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/json_tree_reader_config.png)
 
   - Step 14: Configure the AvroRecordSetWriter as shown below:
 
-      ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/avro_recordset_writer.png)
+      ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/avro_recordset_writer.png)
 
     After following the above steps this section of your flow should look like the following:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/update_jolt_kafka_section.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/update_jolt_kafka_section.png)
 
 
 4. Start the NiFi flow
 5. In a terminal window to your EC2 node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_avro```` topic:
 
     ````
-    bin/kafka-console-consumer.sh --zookeeper localhost:2181 --from-beginning --topic meetup_rsvp_avro
+    bin/kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic meetup_rsvp_avro --from-beginning
     ````
-
 
 5. Messages should now appear in the consumer window.
 
-
 <!--
-
 ------------------
 
 
@@ -490,37 +481,37 @@ For this lab we are going to break from the Meetup RSVP data and use a fictious 
   - Step 5: Start this section of the NiFi flow.
   - Step 6: Go to your Ambari dashboard and navigate to the SAM UI, by selecting the following URL:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/SAM_URL_Link.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/SAM_URL_Link.png)
 
   - Step 7: You should now see the SAM UI that looks like the following:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/sam_default.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/sam_default.png)
 
   - Step 8: To inspect the application, click the icon in the top right hadn corner of the applicaiton and chose 'Edit', as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/sam_app_edit.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/sam_app_edit.png)
 
   - Step 9: You shoudl now see a UI that looks like the following:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/sam_edit.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/sam_edit.png)
 
     Spend a moment to explore and dig into any of the components. Notice at the bottom right hand corner is states "Status Active", this indicates that the application is running.
 
   - Step 10: Verify that Storm the application is running using Storm Mon. To do this go back to your Ambari Dashboard and chose the "Storm Mon link" as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/storm_mon_link.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/storm_mon_link.png)
 
     That should bring up a UI that looks like the following:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/storm_mon_ui.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/storm_mon_ui.png)
 
   - Step 11: We are now ready to explore Superset, to do this go back to the Ambari dashboard and from the Drui service chose the "Quick Link" to "Superset" as shown below:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/superset_link.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/superset_link.png)
 
   - Step 12: Exploring Superset -- following the link in Step 11 should take you to a UI that looks like the following:
 
-    ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/superset_welcome.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/superset_welcome.png)
 
   **NOTE: If you are prompted for a password use admin/admin**
 
