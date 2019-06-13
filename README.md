@@ -167,10 +167,10 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
 ##### Questions to Answer
 1. What does a full RSVP Json object look like?
 2. How many output files do you end up with?
-3. How can you change the file name that Json is saved as from PutFile?
+3. How can you change the file name that JSON is saved as from PutFile?
 3. Why do you think we are splitting out the RSVP's by group?
-4. Why are we using the Update Attribute processor to add a mime.type?
-4. How can you cange the flow to get the member photo from the Json and download it.
+4. Why are we using the UpdateAttribute processor to add a mime.type?
+4. How can you change the flow to get the member photo from the JSON file and download it.
 
 
 ------------------
@@ -204,7 +204,6 @@ In this lab, we will learn how to configure MiNiFi to send data to NiFi:
     nifi.remote.input.socket.port=10000
   ```
 * Restart NiFi via Ambari
-
 
 Now we should be ready to create our flow. To do this do the following:
 
@@ -274,13 +273,12 @@ In this lab we are going to explore creating, writing to and consuming Kafka top
   - Step 2: Naviagte to the Kafka directory (````/usr/hdf/current/kafka-broker````), this is where Kafka is installed, we will use the utilities located in the bin directory.
 
     ````
-    #cd /usr/hdf/current/kafka-broker/
+    cd /usr/hdf/current/kafka-broker/
     ````
 
   - Step 3: Create a topic using the kafka-topics.sh script
     ````
-    bin/kafka-topics.sh --zookeeper localhost:2181 --create --partitions 1 --replication-factor 1 --topic first-topic
-
+    bin/kafka-topics.sh --create --bootstrap-server localhost:6667 --replication-factor 1 --partitions 1 --topic first-topic
     ````
 
     NOTE: Based on how Kafka reports metrics topics with a period ('.') or underscore ('_') may collide with metric names and should be avoided. If they cannot be avoided, then you should only use one of them.
@@ -301,16 +299,14 @@ In this lab we are going to explore creating, writing to and consuming Kafka top
 
   - In the second shell window connect a producer:
 ````
-bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic first-topic
+bin/kafka-console-producer.sh --broker-list localhost:6667 --topic first-topic
 ````
-
-
 - Sending messages. Now that the producer is  connected  we can type messages.
   - Type a message in the producer window
 
 - Messages should appear in the consumer window.
 
-- Close the consumer (ctrl-c) and reconnect using the default offset, of latest. You will now see only new messages typed in the producer window.
+- Close the consumer (Ctrl-C) and reconnect using the default offset, of latest. You will now see only new messages typed in the producer window.
 
 - As you type messages in the producer window they should appear in the consumer window.
 
@@ -324,7 +320,7 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
   - Step 2: Naviagte to the Kafka directory (````/usr/hdf/current/kafka-broker````), this is where Kafka is installed, we will use the utilities located in the bin directory.
 
     ````
-    #cd /usr/hdf/current/kafka-broker/
+    cd /usr/hdf/current/kafka-broker/
     ````
 
   - Step 3: Create a topic using the kafka-topics.sh script
@@ -344,9 +340,11 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
   - Step 1: Add a PublishKafka_1_0 processor to the canvas.
   - Step 2: Add a routing for the success relationship of the ReplaceText processor to the PublishKafka_1_0 processor added in Step 1 as shown below:
 
+****** NOTE:   maybe updating to Publish Kafka 2 record
+
     ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/publishkafka.png)
   - Step 3: Configure the topic and broker for the PublishKafka_1_0 processor,
-  where topic is meetup_rsvp_raw and broker is demo.hortonworks.com:6667.
+  where topic is meetup_rsvp_raw and broker is localhost:6667.
 
 
 3. Start the NiFi flow
@@ -369,7 +367,7 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
   - Step 2: Naviagte to the Kafka directory (````/usr/hdf/current/kafka-broker````), this is where Kafka is installed, we will use the utilities located in the bin directory.
 
     ````
-    #cd /usr/hdf/current/kafka-broker/
+    cd /usr/hdf/current/kafka-broker/
     ````
 
   - Step 3: Create a topic using the kafka-topics.sh script
@@ -402,7 +400,8 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
         Once the schema information fields have been filled and schema uploaded, click **Save**.
 
 3. We are now ready to integrate the schema with NiFi
-  - Step 0: Remove the PutFile and PublishKafka_1_0 processors from the canvas, we will not need them for this section.
+
+  - Step 0: Remove the PutFile and PublishKafka* processors from the canvas, we will not need them for this section.
   - Step 1: Add a UpdateAttribute processor to the canvas.
   - Step 2: Add a routing for the success relationship of the ReplaceText processor to the UpdateAttrbute processor added in Step 1.
   - Step 3: Configure the UpdateAttribute processor as shown below:
@@ -427,9 +426,9 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
   ``
   - Step 7: Add a LogAttribute processor to the canvas.
   - Step 8: Add a routing for the failure relationship of the JoltTransformJSON processor to the LogAttribute processor added in Step 7.
-  - Step 9: Add a PublishKafkaRecord_1_0 to the canvas.
+  - Step 9: Add a PublishKafkaRecord_*_0 to the canvas.
   - Step 10: Add a routing for the success relationship of the JoltTransformJSON processor to the PublishKafkaRecord_1_0 processor added in Step 9.
-  - Step 11: Configure the PublishKafkaRecord_1_0 processor to look like the following:
+  - Step 11: Configure the PublishKafkaRecord_*_0 processor to look like the following:
 
     ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/publishkafka_record_configuration.png)
 
@@ -459,61 +458,3 @@ bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic fi
     ````
 
 5. Messages should now appear in the consumer window.
-
-<!--
-------------------
-
-
-# Lab 7
-
-## Tying it all together
-For this lab we are going to break from the Meetup RSVP data and use a fictious IoT Trucking application.
-
-  - Step 1: SSH to your EC2 instance
-  - Step 2: We are now going to get a data loader running:
-
-    ````
-    cd /root/Data-Loader
-    nohup java -cp /root/Data-Loader/stream-simulator-jar-with-dependencies.jar  hortonworks.hdp.refapp.trucking.simulator.SimulationRegistrySerializerRunnerApp 20000 hortonworks.hdp.refapp.trucking.simulator.impl.domain.transport.Truck  hortonworks.hdp.refapp.trucking.simulator.impl.collectors.KafkaEventSerializedWithRegistryCollector 1 /root/Data-Loader/routes/midwest/ 10000 demo.hortonworks.com:6667 http://demo.hortonworks.com:7788/api/v1 ALL_STREAMS NONSECURE &
-    ````
-  - Step 3: Now that the data is flowing, instantiate the 'IoT Trucking' NiFi template.
-  - Step 4: Inspect the flow that is created and ensure there are no errors, if there are go ahead and correct those.
-  - Step 5: Start this section of the NiFi flow.
-  - Step 6: Go to your Ambari dashboard and navigate to the SAM UI, by selecting the following URL:
-
-    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/SAM_URL_Link.png)
-
-  - Step 7: You should now see the SAM UI that looks like the following:
-
-    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/sam_default.png)
-
-  - Step 8: To inspect the application, click the icon in the top right hadn corner of the applicaiton and chose 'Edit', as shown below:
-
-    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/sam_app_edit.png)
-
-  - Step 9: You shoudl now see a UI that looks like the following:
-
-    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/sam_edit.png)
-
-    Spend a moment to explore and dig into any of the components. Notice at the bottom right hand corner is states "Status Active", this indicates that the application is running.
-
-  - Step 10: Verify that Storm the application is running using Storm Mon. To do this go back to your Ambari Dashboard and chose the "Storm Mon link" as shown below:
-
-    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/storm_mon_link.png)
-
-    That should bring up a UI that looks like the following:
-
-    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/storm_mon_ui.png)
-
-  - Step 11: We are now ready to explore Superset, to do this go back to the Ambari dashboard and from the Drui service chose the "Quick Link" to "Superset" as shown below:
-
-    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/superset_link.png)
-
-  - Step 12: Exploring Superset -- following the link in Step 11 should take you to a UI that looks like the following:
-
-    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/superset_welcome.png)
-
-  **NOTE: If you are prompted for a password use admin/admin**
-
-    Spend some time exploring the dashboard and the datasources.
--->
