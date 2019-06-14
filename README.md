@@ -46,10 +46,10 @@ Credentials will be provided for these services by the instructor:
 
 NOTE: The following instructions are for using Putty. You can also use other popular SSH tools such as [MobaXterm](https://mobaxterm.mobatek.net/) or [SmarTTY](http://smartty.sysprogs.com/)
 
-- Right click to download [this ppk key](https://raw.githubusercontent.com/apsaltis/HDF-Workshop/master/hdf-workshop.ppk) > Save link as > save to Downloads folder
+- Right click to download [this ppk key](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/hdf-workshop.ppk) > Save link as > save to Downloads folder
 - Use putty to connect to your node using the ppk key:
   - Connection > SSH > Auth > Private key for authentication > Browse... > Select hdf-workshop.ppk
-![Image](https://raw.githubusercontent.com/apsaltis/HDF-Workshop/master/putty.png)
+![Image](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/putty.png)
 
 - Create a new seession called `hdf-workshop`
    - For the Host Name use: centos@IP_ADDRESS_OF_EC2_NODE
@@ -112,7 +112,7 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
  Our final flow for this lab will look like the following:
 
   ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/lab1.png)
-  A template for this flow can be found [here](https://raw.githubusercontent.com/apsaltis/HDF-Workshop/master/templates/HDF-Workshop_Lab1-Flow.xml)
+  A template for this flow can be found [here](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/templates/HDF-Workshop_Lab1-Flow.xml)
 
   - Step 1: Add a ConnectWebSocket processor to the cavas
       - In case you are using a downloaded template, the ControllerService will be prepopulated. You will need to enable the ControllerService. Double-click the processor and follow the arrow next to the JettyWebSocketClient
@@ -120,7 +120,7 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
   - Step 2: Add an UpdateAttribute procesor
     - Configure it to have a custom property called ``` mime.type ``` with the value of ``` application/json ```
   - Step 3. Add an EvaluateJsonPath processor and configure it as shown below:
-  ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/jsonpath.png)
+  ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/jsonpath.png)
 
     The properties to add are:
     ```
@@ -177,8 +177,8 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
 
 # Lab 3
 
-  ![Image](https://github.com/apsaltis/HDF-Workshop/raw/master/lab3.png)
-  A template for this flow can be found [here](https://raw.githubusercontent.com/apsaltis/HDF-Workshop/master/templates/MiNiFi_Flow.xml)
+  ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/lab3.png)
+  A template for this flow can be found [here](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/templates/MiNiFi_Flow.xml)
 
 
 ## Getting started with MiNiFi ##
