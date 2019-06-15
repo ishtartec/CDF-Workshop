@@ -278,28 +278,28 @@ In this lab we are going to explore creating, writing to and consuming Kafka top
 
   - Step 3: Create a topic using the kafka-topics.sh script
     ````
-    bin/kafka-topics.sh --create --bootstrap-server localhost:6667 --replication-factor 1 --partitions 1 --topic first-topic
+    bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic meetup_rsvp_raw
     ````
 
     NOTE: Based on how Kafka reports metrics topics with a period ('.') or underscore ('_') may collide with metric names and should be avoided. If they cannot be avoided, then you should only use one of them.
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --bootstrap-server localhost:6667
+    bin/kafka-topics.sh --list --zookeeper localhost:2181
     ````
 
 2. Testing Producers and Consumers
   - Step 1: Open a second terminal to your EC2 node and navigate to the Kafka directory
   - In one shell window connect a consumer:
     ````
-    bin/kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic first-topic --from-beginning
+    bin/kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic meetup_rsvp_raw --from-beginning
     ````
 
     Note: using –from-beginning will tell the broker we want to consume from the first message in the topic. Otherwise it will be from the latest offset.
 
   - In the second shell window connect a producer:
 ````
-bin/kafka-console-producer.sh --broker-list localhost:6667 --topic first-topic
+bin/kafka-console-producer.sh --broker-list localhost:6667 --topic meetup_rsvp_raw
 ````
 - Sending messages. Now that the producer is  connected  we can type messages.
   - Type a message in the producer window
@@ -310,42 +310,26 @@ bin/kafka-console-producer.sh --broker-list localhost:6667 --topic first-topic
 
 - As you type messages in the producer window they should appear in the consumer window.
 
+Make sure all the messages are consumed from the topic before closing as we will use this topic for your integration example.
+
 ------------------
 
 # Lab 5
 
 ## Integrating Kafka with NiFi
-1. Creating the topic
-  - Step 1: Open an SSH connection to your EC2 Node.
-  - Step 2: Naviagte to the Kafka directory (````/usr/hdf/current/kafka-broker````), this is where Kafka is installed, we will use the utilities located in the bin directory.
 
-    ````
-    cd /usr/hdf/current/kafka-broker/
-    ````
+Using the topic already created, meetup_rsvp_raw, we will publish from Apache NiFi.
 
-  - Step 3: Create a topic using the kafka-topics.sh script
-    ````
-    bin/kafka-topics.sh --create --bootstrap-server localhost:6667 --replication-factor 1 --partitions 1 --topic meetup_rsvp_raw
-
-    ````
-
-    NOTE: Based on how Kafka reports metrics topics with a period ('.') or underscore ('_') may collide with metric names and should be avoided. If they cannot be avoided, then you should only use one of them.
-
-  - Step 4:	Ensure the topic was created
-    ````
-    bin/kafka-topics.sh --list --bootstrap-server localhost:6667
-    ````
-
-2. Integrating NiFi
-  - Step 1: Add a PublishKafka_1_0 processor to the canvas.
-  - Step 2: Add a routing for the success relationship of the ReplaceText processor to the PublishKafka_1_0 processor added in Step 1 as shown below:
+1. Integrating NiFi
+  - Step 1: Add a PublishKafka_*_0 processor to the canvas.
+  - Step 2: Add a routing for the success relationship of the ReplaceText processor to the PublishKafka_*_0 processor added in Step 1 as shown below:
 
 ****** NOTE:   maybe updating to Publish Kafka 2 record
 
     ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/publishkafka.png)
-  - Step 3: Configure the topic and broker for the PublishKafka_1_0 processor,
+    
+  - Step 3: Configure the topic and broker for the PublishKafka_*_0 processor,
   where topic is meetup_rsvp_raw and broker is localhost:6667.
-
 
 3. Start the NiFi flow
 4. In a terminal window to your EC2 node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_raw```` topic:
@@ -380,7 +364,7 @@ bin/kafka-console-producer.sh --broker-list localhost:6667 --topic first-topic
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --bootstrap-server localhost:6667
+    bin/kafka-topics.sh --list --zookeeper localhost:2181
     ````
 
 2. Adding the Schema to the Schema Registry
