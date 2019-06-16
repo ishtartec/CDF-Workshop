@@ -241,12 +241,12 @@ Now we should be ready to create our flow. To do this do the following:
 
       ````sudo bin/config.sh transform /temp/MiNiFi_Flow.xml config.yml````
 
-10. Next copy the ````config.yml```` to the ````minifi-0.4.0/conf```` directory. That is the file that MiNiFi uses to generate the nifi.properties file and the flow.xml.gz for MiNiFi.
+10. Next copy the ````config.yml```` to the ````minifi/conf```` directory. That is the file that MiNiFi uses to generate the nifi.properties file and the flow.xml.gz for MiNiFi.
 
 11. That is it, we are now ready to start MiNiFi. To start MiNiFi from a command prompt execute the following:
 
   ```
-  cd /usr/hdf/current/minifi-0.4.0
+  cd /usr/hdf/current/minifi
   sudo bin/minifi.sh start
   tail -f logs/minifi-app.log
   ```
@@ -255,7 +255,7 @@ You should be able to now go to your NiFi flow and see data coming in from MiNiF
 
 You may tail the log of the MiNiFi application by
    ```
-   tail -f /usr/hdf/current/minifi/minifi-0.4.0/logs/minifi-app.log
+   tail -f /usr/hdf/current/minifi/logs/minifi-app.log 
    ```
 If you see error logs such as "the remote instance indicates that the port is not in a valid state",
 it is because the Input Port has not been started.
@@ -278,28 +278,28 @@ In this lab we are going to explore creating, writing to and consuming Kafka top
 
   - Step 3: Create a topic using the kafka-topics.sh script
     ````
-    bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic meetup_rsvp_raw
+    bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic meetup_rsvp_raw
     ````
 
     NOTE: Based on how Kafka reports metrics topics with a period ('.') or underscore ('_') may collide with metric names and should be avoided. If they cannot be avoided, then you should only use one of them.
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --zookeeper localhost:2181
+    bin/kafka-topics.sh --list --zookeeper demo.hortonworks.com:2181
     ````
 
 2. Testing Producers and Consumers
   - Step 1: Open a second terminal to your EC2 node and navigate to the Kafka directory
   - In one shell window connect a consumer:
     ````
-    bin/kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic meetup_rsvp_raw --from-beginning
+    bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_rsvp_raw --from-beginning
     ````
 
     Note: using –from-beginning will tell the broker we want to consume from the first message in the topic. Otherwise it will be from the latest offset.
 
   - In the second shell window connect a producer:
 ````
-bin/kafka-console-producer.sh --broker-list localhost:6667 --topic meetup_rsvp_raw
+bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic meetup_rsvp_raw
 ````
 - Sending messages. Now that the producer is  connected  we can type messages.
   - Type a message in the producer window
@@ -335,7 +335,7 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 4. In a terminal window to your EC2 node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_raw```` topic:
 
     ````
-    bin/kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic meetup_rsvp_raw --from-beginning
+    bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_rsvp_raw --from-beginning
     ````
 
 5. Messages should now appear in the consumer window.
@@ -356,7 +356,7 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 
   - Step 3: Create a topic using the kafka-topics.sh script
     ````
-    bin/kafka-topics.sh --create --bootstrap-server localhost:6667 --replication-factor 1 --partitions 1 --topic meetup_rsvp_avro
+    bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic meetup_rsvp_avro
 
     ````
 
@@ -364,7 +364,7 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --zookeeper localhost:2181
+    bin/kafka-topics.sh --list --zookeeper demo.hortonworks.com:2181
     ````
 
 2. Adding the Schema to the Schema Registry
@@ -438,7 +438,7 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 5. In a terminal window to your EC2 node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_avro```` topic:
 
     ````
-    bin/kafka-console-consumer.sh --bootstrap-server localhost:6667 --topic meetup_rsvp_avro --from-beginning
+    bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_rsvp_avro --from-beginning
     ````
 
 5. Messages should now appear in the consumer window.
