@@ -48,11 +48,11 @@ NOTE: The following instructions are for using Putty. You can also use other pop
 
 - You were sent a PEM and a PPK.
 
-- Use putty to connect to your node using the ppk key:
+- Use Putty to connect to your node using the ppk key:
   - Connection > SSH > Auth > Private key for authentication > Browse... > Select cdf.ppk
 ![Image](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/putty.png)
 
-- Create a new seession called `hdf-workshop`
+- Create a new session called `cdf-workshop`
    - For the Host Name use: centos@IP_ADDRESS_OF_EC2_NODE
    - Click "Save" on the session page before logging in
 
@@ -76,7 +76,6 @@ NOTE: The following instructions are for using Putty. You can also use other pop
     ```
     sudo su -
     ```
-
 
 #### Login to Ambari
 
@@ -180,7 +179,6 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
   ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/lab3.png)
   A template for this flow can be found [here](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/templates/MiNiFi_Flow.xml)
 
-
 ## Getting started with MiNiFi ##
 
 In this lab, we will learn how to configure MiNiFi to send data to NiFi:
@@ -227,12 +225,11 @@ Now we should be ready to create our flow. To do this do the following:
    * Select the "Create Template" button from the toolbar
    * Choose a name for your template
 
-
 7. Now we need to download the template
 8. Now SCP the template you downloaded to the ````/tmp```` directory on your EC2 instance. If you are using Windows you will need to download WinSCP (https://winscp.net/eng/download.php)
 9.  We are now ready to setup MiNiFi. However before doing that we need to convert the template to YAML format which MiNiFi uses. To do this we need to do the following:
 
-    * Navigate to the minifi-toolkit directory (/usr/hdf/current/minifi-toolkit-0.4.0)
+    * Navigate to the minifi-toolkit directory (/usr/hdf/current/minifi-toolkit)
     * Transform the template that we downloaded using the following command:
 
       ````sudo bin/config.sh transform <INPUT_TEMPLATE> <OUTPUT_FILE>````
@@ -323,9 +320,7 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 1. Integrating NiFi
   - Step 1: Add a PublishKafka_*_0 processor to the canvas.
   - Step 2: Add a routing for the success relationship of the ReplaceText processor to the PublishKafka_*_0 processor added in Step 1 as shown below:
-
-****** NOTE:   maybe updating to Publish Kafka 2 record
-
+  
     ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/publishkafka.png)
     
   - Step 3: Configure the topic and broker for the PublishKafka_*_0 processor,
