@@ -182,9 +182,14 @@ In this lab, we will learn how to configure MiNiFi to send data to NiFi:
 * Configuring and starting MiNiFi
 * Enjoying the data flow!
 
+![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/ambariLogin.png)
+
+![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/callNiFiFromAmbari.png)
 
 ## Setting up the Flow for NiFi
 **NOTE:** Before starting NiFi we need to enable Site-to-Site communication. To do that we will use Ambari to update the required configuration. In Ambari the below property values can be found at ````http://<EC2_NODE>:8080/#/main/services/NIFI/configs```` .
+
+![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/ambarichangeproperties.png)
 
 * Change:
   ```
@@ -250,6 +255,8 @@ You may tail the log of the MiNiFi application by
 If you see error logs such as "the remote instance indicates that the port is not in a valid state",
 it is because the Input Port has not been started.
 Start the port and you will see messages being accumulated in its downstream queue.
+
+![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/nifiportdetails2.png)
 
 ------------------
 
@@ -358,9 +365,15 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 2. Adding the Schema to the Schema Registry
   - Step 1: Open a browser and navigate to the Schema Registry UI. You can get to this from the either the ```Quick Links``` drop down in Ambari, as shown below:
 
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/ambarisr.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/schemaregistry2.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/srAddSchema.png)
+    ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/srcontrollerconfiguration.png)
+
     ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/registry_quick_link.png)
 
-    or by going to ````http://<EC2_NODE>:17788````
+    or by going to ````http://<EC2_NODE>:7788/ui/#/
+    
   - Step 2: Create Meetup RSVP Schema in the Schema Registry
     1. Click on “+” button to add new schemas. A window called “Add New Schema” will appear.
     2. Fill in the fields of the ````Add Schema Dialog```` as follows:
