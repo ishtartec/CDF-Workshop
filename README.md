@@ -1,11 +1,11 @@
 # Contents
-- [Lab 1](#lab-1)
-  - Access cluster
-- [Lab 2](#lab-2) - Getting started with NiFi
+- [Lab 1](#lab-1) - Getting started with Apache NiFi
   - Consuming the Meetup RSVP stream
   - Extracting JSON elements we are interested in
   - Splitting JSON into smaller fragments
   - Writing JSON to File System
+- [Lab 2](#lab-2)
+  - Access the cluster  
 - [Lab 3](#lab-3) - MiNiFi
   - Enable Site2Site in NiFi
   - Designing the MiNiFi Flow
@@ -24,59 +24,6 @@
   - Adding the Meetup Avro Schema
   - Sending Avro data to Kafka
 
-<!-- - [Lab 7](#lab-7) - Tying it all together with SAM
-  - Creating the Streaming Application
-  - Watching the dashboard -->
-
-
---------------- 2019 Cloudera
-
-# Lab 1
-
-## Accessing your Cluster
-
-Credentials will be provided for these services by the instructor:
-
-* SSH
-* Ambari
-
-## Use your Cluster
-
-### To connect using Putty from Windows laptop
-
-NOTE: The following instructions are for using Putty. You can also use other popular SSH tools such as [MobaXterm](https://mobaxterm.mobatek.net/) or [SmarTTY](http://smartty.sysprogs.com/)
-
-- You were sent a PEM and a PPK.
-
-- Use Putty to connect to your node using the ppk key:
-  - Connection > SSH > Auth > Private key for authentication > Browse... > Select cdf.ppk
-![Image](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/putty.png)
-
-- Create a new session called `cdf-workshop`
-   - For the Host Name use: centos@IP_ADDRESS_OF_EC2_NODE
-   - Click "Save" on the session page before logging in
-
-![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/putty-session.png)
-
-### To connect from Linux/MacOSX laptop
-
-- SSH into your EC2 node using below steps:
-- Copy pem key to ~/.ssh dir and correct permissions
-    ```
-    cp ~/Downloads/cdf.pem ~/.ssh/
-    chmod 400 ~/.ssh/cdf.pem
-    ```
- - Login to the ec2 node of the you have been assigned by replacing IP_ADDRESS_OF_EC2_NODE below with EC2 node IP Address (your instructor will provide this)
-    ```
-     ssh -i  ~/.ssh/cdf.pem centos@IP_ADDRESS_OF_EC2_NODE
-
-    ```
-
-  - To change user to root you can:
-    ```
-    sudo su -
-    ```
-
 #### Login to Ambari
 
 - Login to Ambari web UI by opening http://{YOUR_IP}:8080 and log in with **admin/StrongPassword**
@@ -84,13 +31,13 @@ NOTE: The following instructions are for using Putty. You can also use other pop
 - You will see a list of Hadoop components running on your node on the left side of the page
   - They should all show green (ie started) status. If not, start them by Ambari via 'Service Actions' menu for that service
 
-#### NiFi Install
+#### NiFi Installation Directory
 
 - NiFi is installed at: /usr/hdf/current/nifi
 
 -----------------------------
 
-# Lab 2
+# Lab 1
 
 In this lab, we will learn how to:
   - Consume the Meetup RSVP stream
@@ -173,6 +120,52 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
 
 
 ------------------
+
+# Lab 2
+
+## Accessing your Cluster
+
+Credentials will be provided for these services by the instructor:
+
+* SSH
+* Ambari
+
+## Use your Cluster
+
+### To connect using Putty from Windows laptop
+
+NOTE: The following instructions are for using Putty. You can also use other popular SSH tools such as [MobaXterm](https://mobaxterm.mobatek.net/) or [SmarTTY](http://smartty.sysprogs.com/)
+
+- You were sent a PEM and a PPK.
+
+- Use Putty to connect to your node using the ppk key:
+  - Connection > SSH > Auth > Private key for authentication > Browse... > Select cdf.ppk
+![Image](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/putty.png)
+
+- Create a new session called `cdf-workshop`
+   - For the Host Name use: centos@IP_ADDRESS_OF_EC2_NODE
+   - Click "Save" on the session page before logging in
+
+![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/putty-session.png)
+
+### To connect from Linux/MacOSX laptop
+
+- SSH into your EC2 node using below steps:
+- Copy pem key to ~/.ssh dir and correct permissions
+    ```
+    cp ~/Downloads/cdf.pem ~/.ssh/
+    chmod 400 ~/.ssh/cdf.pem
+    ```
+ - Login to the ec2 node of the you have been assigned by replacing IP_ADDRESS_OF_EC2_NODE below with EC2 node IP Address (your instructor will provide this)
+    ```
+     ssh -i  ~/.ssh/cdf.pem centos@IP_ADDRESS_OF_EC2_NODE
+
+    ```
+
+  - To change user to root you can:
+    ```
+    sudo su -
+    ```
 
 # Lab 3
 
