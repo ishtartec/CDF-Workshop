@@ -6,11 +6,10 @@
   - Writing JSON to File System
 - [Lab 2](#lab-2)
   - Access the cluster  
-- [Lab 3](#lab-3) - MiNiFi
-  - Enable Site2Site in NiFi
+- [Lab 3](#lab-3) - MiNiFi CPP and Java Agents with EFM
   - Designing the MiNiFi Flow
   - Preparing the flow
-  - Running MiNiFi
+  - Running MiNiFi agents
 - [Lab 4](#lab-4) - Kafka Basics
   - Creating a topic
   - Producing data
@@ -170,9 +169,8 @@ NOTE: The following instructions are for using Putty. You can also use other pop
 # Lab 3
 
   ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/lab3.png)
-  A template for this flow can be found [here](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/templates/MiNiFi_Flow.xml)
 
-## Getting started with MiNiFi ##
+## Getting started with MiNiFi and EFM ##
 
 In this lab, we will learn how to configure MiNiFi to send data to NiFi:
 
@@ -182,24 +180,62 @@ In this lab, we will learn how to configure MiNiFi to send data to NiFi:
 * Configuring and starting MiNiFi
 * Enjoying the data flow!
 
-![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/ambariLogin.png)
+Go to NiFi Registry and create a bucket named **demo**
 
-![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/callNiFiFromAmbari.png)
+As root (sudo su -) start EFM, MiNiFi C++, MiNiFi Java
 
-## Setting up the Flow for NiFi
-**NOTE:** Before starting NiFi we need to enable Site-to-Site communication. To do that we will use Ambari to update the required configuration. In Ambari the below property values can be found at ````http://<EC2_NODE>:8080/#/main/services/NIFI/configs```` .
+```bash
+/etc/efm/efm-1.0.0.1.0.0.0-54/bin/efm.sh start
+/etc/minifi-cpp/nifi-minifi-cpp-0.6.0/bin/minifi.sh start
+/etc/minifi-java/minifi-0.6.0.1.0.0.0-54/bin/minifi.sh start
+```
 
-![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/ambarichangeproperties.png)
+Visit [EFM UI](http://YOURIP:10080/efm/ui/)
 
-* Change:
-  ```
-    nifi.remote.input.socket.port=
-  ```
-  To
-  ```
-    nifi.remote.input.socket.port=10000
-  ```
-* Restart NiFi via Ambari
+You should see heartbeats coming from the agent
+
+![EFM agents monitor](images/efm-agents-monitor.png)
+
+Now, **on the root canvas**, create a simple flow to collect local syslog messages and forward them to NiFi, where the logs will be parsed, transformed into another format and pushed to a Kafka topic.
+
+Our agent has been tagged with the class 'demo' (check nifi.c2.agent.class property in /usr/minifi/conf/bootstrap.conf) so we are going to create a template under this specific class
+
+But first we need to add an Input Port to the root canvas of NiFi and build a flow as described before. Input Port are used to receive flow files from remote MiNiFi agents or other NiFi instances.
+
+![NiFi syslog parser](images/nifi-syslog-parser.png)
+
+Don't forget to create a new Kafka topic as explained in Lab 3 above.
+
+We are going to use a Grok parser to parse the syslog messages. Here is a Grok expression that can be used to parse such logs format:
+
+```%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}```
+
+Now that we have built the NiFi flow that will receive the logs, let's go back to the EFM UI and build the MiNiFi flow as below:
+
+![CEM flow](images/cem-minifi-flow.png)
+
+This MiNiFi agent will tail /var/log/messages and send the logs to a remote process group (our NiFi instance) using the Input Port.
+
+![Tailfile](images/tail-file.png)
+
+Don't forget to increase the scheduler!
+
+Please note that the NiFi instance has been configured to receive data over HTTP only, not RAW
+
+![Remote process group](images/remote-process-group.png)
+
+Now we can start the NiFi flow and publish the MiNiFi flow to NiFi registry (Actions > Publish...)
+
+Visit [NiFi Registry UI](http://demo.cloudera.com:61080/nifi-registry/explorer/grid-list) to make sure your flow has been published successfully.
+
+![NiFi Registry](images/nifi-registry.png)
+
+Within few seconds, you should be able to see syslog messages streaming through your NiFi flow and be published to the Kafka topic you have created.
+
+![Syslog message](images/syslog-json.png)
+
+
+
 
 Now we should be ready to create our flow. To do this do the following:
 
