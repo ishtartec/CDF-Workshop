@@ -168,7 +168,7 @@ NOTE: The following instructions are for using Putty. You can also use other pop
 
 # Lab 3
 
-  ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/lab3.png)
+  ![Image](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/cemOpenFlows.png)
 
 ## Getting started with MiNiFi and EFM ##
 
@@ -180,7 +180,7 @@ In this lab, we will learn how to configure MiNiFi to send data to NiFi:
 * Configuring and starting MiNiFi
 * Enjoying the data flow!
 
-Go to NiFi Registry and create a bucket named **demo**
+Go to NiFi Registry and create a bucket named **cem**
 
 As root (sudo su -) start EFM, MiNiFi C++, MiNiFi Java
 
@@ -200,12 +200,13 @@ You should see heartbeats coming from the agent.
 
 ![EFM agents monitoring details](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/cemEventDetails.png)
 
-  
 Now, **on the root canvas**, create a simple flow to collect local syslog messages and forward them to NiFi, where the logs will be parsed, transformed into another format and pushed to a Kafka topic.
 
-Our agent has been tagged with the class 'demo' (check nifi.c2.agent.class property in /usr/minifi/conf/bootstrap.conf) so we are going to create a template under this specific class
+Our Java MiNiFi Agent has been tagged with the class 'minifijava' (check nifi.c2.agent.class property in /etc/minifi-java/minifi-0.6.0.1.0.0.0-54/conf/bootstrap.conf) so we are going to create a template under this specific class.
 
-But first we need to add an Input Port to the root canvas of NiFi and build a flow as described before. Input Port are used to receive flow files from remote MiNiFi agents or other NiFi instances.
+Our MiNiFi C++ Agent has been tagged with the class 'minificpp' (check nifi.c2.agent.class property in /etc/minifi-cpp/nifi-minifi-cpp-0.6.0/conf/minifi.properties) so we are going to create a template under this specific class.
+
+But first we need to add an Input Port to the root canvas of NiFi and build a flow as described before. Input Port are used to receive flow files from remote MiNiFi agents or other NiFi instances.  We create one for each agent class to make it easy.
 
 ![NiFi syslog parser](images/nifi-syslog-parser.png)
 
@@ -240,22 +241,31 @@ Within few seconds, you should be able to see syslog messages streaming through 
 ![Syslog message](images/syslog-json.png)
 
 
-
-
 Now we should be ready to create our flow. To do this do the following:
 
-1.	The first thing we are going to do is setup an Input Port. This is the port that MiNiFi will be sending data to. To do this drag the Input Port icon to the canvas and call it "From MiNiFi".
+1.	The first thing we are going to do is setup an Input Port. This is the port that MiNiFi will be sending data to. To do this drag the Input Port icon to the canvas and call it whatever you like.  We are only interested in the id.
+
+![Connection](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/configureConnection.png)
 
 2. Now that the Input Port is configured we need to have somewhere for the data to go once we receive it. In this case we will keep it very simple and just log the attributes. To do this drag the Processor icon to the canvas and choose the LogAttribute processor.
+
+![Configure RPG](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/configureRPG.png)
+
+![Create Remote Connection](https://github.com/tspannhw/CDF-Workshop/blob/master/createRemoteConnection.png)
+
+![EFM REST API](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/efmapi.png)
+
 
 3.	Now that we have the input port and the processor to handle our data, we need to connect them.
 
 4.  We are now ready to build the MiNiFi side of the flow. To do this do the following:
-	* Add a GenerateFlowFile processor to the canvas (don't forget to configure the properties on it)
+
+	* Add a TailFlow processor to the canvas (don't forget to configure the properties on it)
 	* Add a Remote Processor Group to the canvas
 
            For the URL copy and paste the URL for the NiFi UI from your browser
-   * Connect the GenerateFlowFile to the Remote Process Group
+	   
+   * Connect the TailFile to the Remote Process Group
 
 5. The next step is to generate the flow we need for MiNiFi. To do this do the following steps:
 
