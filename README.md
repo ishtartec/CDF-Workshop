@@ -192,10 +192,15 @@ As root (sudo su -) start EFM, MiNiFi C++, MiNiFi Java
 
 Visit [EFM UI](http://YOURIP:10080/efm/ui/)
 
-You should see heartbeats coming from the agent
+![EFM UI](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/cemMiNiFiJavaEdit.png)
 
-![EFM agents monitor](images/efm-agents-monitor.png)
+You should see heartbeats coming from the agent.
 
+![EFM agents monitor](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/cemEvents2.png)
+
+![EFM agents monitoring details](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/cemEventDetails.png)
+
+  
 Now, **on the root canvas**, create a simple flow to collect local syslog messages and forward them to NiFi, where the logs will be parsed, transformed into another format and pushed to a Kafka topic.
 
 Our agent has been tagged with the class 'demo' (check nifi.c2.agent.class property in /usr/minifi/conf/bootstrap.conf) so we are going to create a template under this specific class
