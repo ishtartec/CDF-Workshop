@@ -208,37 +208,37 @@ Our MiNiFi C++ Agent has been tagged with the class 'minificpp' (check nifi.c2.a
 
 But first we need to add an Input Port to the root canvas of NiFi and build a flow as described before. Input Port are used to receive flow files from remote MiNiFi agents or other NiFi instances.  We create one for each agent class to make it easy.
 
-![NiFi syslog parser](images/nifi-syslog-parser.png)
+![NiFi syslog parser](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/efmMiNiFiFlow.png)
 
-Don't forget to create a new Kafka topic as explained in Lab 3 above.
+Don't forget to create a new Kafka topic.
 
-We are going to use a Grok parser to parse the syslog messages. Here is a Grok expression that can be used to parse such logs format:
+We are going to use a Grok parser to parse the Syslog messages. Here is a Grok expression that can be used to parse such logs format:
 
 ```%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{DATA:syslog_program}(?:\[%{POSINT:syslog_pid}\])?: %{GREEDYDATA:syslog_message}```
 
-Now that we have built the NiFi flow that will receive the logs, let's go back to the EFM UI and build the MiNiFi flow as below:
+Now that we have built the Apache NiFi flow that will receive the logs, let's go back to the EFM UI and build the MiNiFi flow as below:
 
-![CEM flow](images/cem-minifi-flow.png)
+![CEM flow](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/efmMiNiFiFlow.png)
 
-This MiNiFi agent will tail /var/log/messages and send the logs to a remote process group (our NiFi instance) using the Input Port.
+This MiNiFi agent will tail /var/log/messages or /var/log/secure and send the logs to a remote process group (our NiFi instance) using the Input Port.
 
-![Tailfile](images/tail-file.png)
+![Tailfile](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/efmMiNiFiFlow.png)
 
-Don't forget to increase the scheduler!
+Check to make sure only 1 concurrent call.
 
-Please note that the NiFi instance has been configured to receive data over HTTP only, not RAW
+Please note that the NiFi instance has been configured to receive data over HTTP only, not RAW!
 
-![Remote process group](images/remote-process-group.png)
+![Remote process group](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/configureRemoteProcessGroup.png)
 
 Now we can start the NiFi flow and publish the MiNiFi flow to NiFi registry (Actions > Publish...)
 
-Visit [NiFi Registry UI](http://demo.cloudera.com:61080/nifi-registry/explorer/grid-list) to make sure your flow has been published successfully.
+Visit [NiFi Registry UI](http://YOURURL:61080/nifi-registry/explorer/grid-list) to make sure your flow has been published successfully.
 
-![NiFi Registry](images/nifi-registry.png)
+![NiFi Registry](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/nifiregistry.png)
 
 Within few seconds, you should be able to see syslog messages streaming through your NiFi flow and be published to the Kafka topic you have created.
 
-![Syslog message](images/syslog-json.png)
+![Syslog message](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/syslognifi2.png)
 
 
 Now we should be ready to create our flow. To do this do the following:
@@ -255,53 +255,9 @@ Now we should be ready to create our flow. To do this do the following:
 
 ![EFM REST API](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/efmapi.png)
 
-
-3.	Now that we have the input port and the processor to handle our data, we need to connect them.
-
-4.  We are now ready to build the MiNiFi side of the flow. To do this do the following:
-
-	* Add a TailFlow processor to the canvas (don't forget to configure the properties on it)
-	* Add a Remote Processor Group to the canvas
-
-           For the URL copy and paste the URL for the NiFi UI from your browser
-	   
-   * Connect the TailFile to the Remote Process Group
-
-5. The next step is to generate the flow we need for MiNiFi. To do this do the following steps:
-
-   * Create a template for MiNiFi
-   * Select the GenerateFlowFile, the NiFi Flow Remote Processor Group, and the Connection between them (these are the only things needed for MiNiFi)
-   * Select the "Create Template" button from the toolbar
-   * Choose a name for your template
-
-7. Now we need to download the template
-8. Now SCP the template you downloaded to the ````/tmp```` directory on your EC2 instance. If you are using Windows you will need to download WinSCP (https://winscp.net/eng/download.php)
-9.  We are now ready to setup MiNiFi. However before doing that we need to convert the template to YAML format which MiNiFi uses. To do this we need to do the following:
-
-    * Navigate to the minifi-toolkit directory (/usr/hdf/current/minifi-toolkit)
-    * Transform the template that we downloaded using the following command:
-
-      ````sudo bin/config.sh transform <INPUT_TEMPLATE> <OUTPUT_FILE>````
-
-      For example:
-
-      ````sudo bin/config.sh transform /temp/MiNiFi_Flow.xml config.yml````
-
-10. Next copy the ````config.yml```` to the ````minifi/conf```` directory. That is the file that MiNiFi uses to generate the nifi.properties file and the flow.xml.gz for MiNiFi.
-
-11. That is it, we are now ready to start MiNiFi. To start MiNiFi from a command prompt execute the following:
-
-  ```
-  cd /usr/hdf/current/minifi
-  sudo bin/minifi.sh start
-  tail -f logs/minifi-app.log
-  ```
-
-You should be able to now go to your NiFi flow and see data coming in from MiNiFi.
-
 You may tail the log of the MiNiFi application by
    ```
-   tail -f /usr/hdf/current/minifi/logs/minifi-app.log 
+   tail -f (See Log Directories) logs/minifi-app.log 
    ```
 If you see error logs such as "the remote instance indicates that the port is not in a valid state",
 it is because the Input Port has not been started.
