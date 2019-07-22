@@ -186,7 +186,7 @@ As root (sudo su -) start EFM, MiNiFi C++, MiNiFi Java
 
 ```bash
 /etc/efm/efm-1.0.0.1.0.0.0-54/bin/efm.sh start
-/etc/minifi-cpp/nifi-minifi-cpp-0.6.0/bin/minifi.sh start
+/etc/minifi-cpp/nifi-minifi-cpp-0.6.0/bin/run.sh
 /etc/minifi-java/minifi-0.6.0.1.0.0.0-54/bin/minifi.sh start
 ```
 
