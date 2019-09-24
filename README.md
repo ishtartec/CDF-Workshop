@@ -23,16 +23,35 @@
   - Adding the Meetup Avro Schema
   - Sending Avro data to Kafka
 
-#### Login to Ambari
+#### Available instances
 
-- Login to Ambari web UI by opening http://{YOUR_IP}:8080 and log in with **admin/StrongPassword**
+```bash
+$ ansible-inventory -i inventory.compute.gcp.yml --graph
+@all:
+  |--@_europe_west1_c:
+  |  |--(1)  34.76.103.103
+  |  |--(2)  34.76.106.104
+  |  |--(3)  34.76.120.32
+  |  |--(4)  34.76.92.77
+  |  |--(5)  35.187.189.41
+  |  |--(6)  35.195.204.28
+  |  |--(7)  35.205.113.253
+  |  |--(8)  35.205.181.73
+  |  |--(9)  35.205.55.181
+  |  |--(10) 35.241.210.88
+  |--@ungrouped:
+```
+
+#### Login to Cloudera Manager
+
+- Login to Cloudera Manager web UI by opening http://{YOUR_IP}:7180 and log in with **admin/admin**
 
 - You will see a list of Hadoop components running on your node on the left side of the page
-  - They should all show green (ie started) status. If not, start them by Ambari via 'Service Actions' menu for that service
+  - They should all show green (ie started) status. If not, start them by Cloudera Manager via 'Service Actions' menu for that service
 
-#### NiFi Installation Directory
+#### MiNiFi Installation Directory
 
-- NiFi is installed at: /usr/hdf/current/nifi
+- MiNiFi is installed at: /opt/cloudera/cem
 
 -----------------------------
 
@@ -57,7 +76,7 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
  Our final flow for this lab will look like the following:
 
   ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/lab1.png)
-  A template for this flow can be found [here](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/templates/HDF-Workshop_Lab1-Flow.xml)
+  A template for this flow can be found [here](https://raw.githubusercontent.com/ishtartec/CDF-Workshop/master/templates/HDF-Workshop_Lab1-Flow.xml)
 
   - Step 1: Add a ConnectWebSocket processor to the cavas
       - In case you are using a downloaded template, the ControllerService will be prepopulated. You will need to enable the ControllerService. Double-click the processor and follow the arrow next to the JettyWebSocketClient
@@ -130,7 +149,7 @@ To get started we need to consume the data from the Meetup RSVP stream, extract 
 Credentials will be provided for these services by the instructor:
 
 * SSH
-* Ambari
+* Cloudera Manager
 
 ## Use your Cluster
 
@@ -138,29 +157,19 @@ Credentials will be provided for these services by the instructor:
 
 NOTE: The following instructions are for using Putty. You can also use other popular SSH tools such as [MobaXterm](https://mobaxterm.mobatek.net/) or [SmarTTY](http://smartty.sysprogs.com/)
 
-- You were sent a PEM and a PPK.
-
-- Use Putty to connect to your node using the ppk key:
-  - Connection > SSH > Auth > Private key for authentication > Browse... > Select cdf.ppk
-![Image](https://raw.githubusercontent.com/tspannhw/CDF-Workshop/master/putty.png)
 
 - Create a new session called `cdf-workshop`
-   - For the Host Name use: centos@IP_ADDRESS_OF_EC2_NODE
+   - For the Host Name use: student@IP_ADDRESS_OF_GCP_NODE
    - Click "Save" on the session page before logging in
 
 ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/putty-session.png)
 
 ### To connect from Linux/MacOSX laptop
 
-- SSH into your EC2 node using below steps:
-- Copy pem key to ~/.ssh dir and correct permissions
+- SSH into your GCP node using below steps:
+ - Login to the gcp node of the you have been assigned by replacing IP_ADDRESS_OF_GCP_NODE below with GCP node IP Address (your instructor will provide this)
     ```
-    cp ~/Downloads/cdf.pem ~/.ssh/
-    chmod 400 ~/.ssh/cdf.pem
-    ```
- - Login to the ec2 node of the you have been assigned by replacing IP_ADDRESS_OF_EC2_NODE below with EC2 node IP Address (your instructor will provide this)
-    ```
-     ssh -i  ~/.ssh/cdf.pem centos@IP_ADDRESS_OF_EC2_NODE
+     ssh student@IP_ADDRESS_OF_GCP_NODE
 
     ```
 
@@ -188,9 +197,8 @@ Go to NiFi Registry and create a bucket named **cem**
 As root (sudo su -) start EFM, MiNiFi C++, MiNiFi Java
 
 ```bash
-/etc/efm/efm-1.0.0.1.0.0.0-54/bin/efm.sh start
-/etc/minifi-cpp/nifi-minifi-cpp-0.6.0/bin/run.sh
-/etc/minifi-java/minifi-0.6.0.1.0.0.0-54/bin/minifi.sh start
+/opt/cloudera/cem/efm/bin/efm.sh start
+/opt/cloudera/cem/minifi/bin/minifi.sh start
 ```
 
 Visit [EFM UI](http://YOURIP:10080/efm/ui/)
@@ -276,37 +284,37 @@ Start the port and you will see messages being accumulated in its downstream que
 In this lab we are going to explore creating, writing to and consuming Kafka topics. This will come in handy when we later integrate Kafka with NiFi and Streaming Analytics Manager.  See:  https://kafka.apache.org/quickstart
 
 1. Creating a topic
-  - Step 1: Open an SSH connection to your EC2 Node.
-  - Step 2: Naviagte to the Kafka directory (````/usr/hdf/current/kafka-broker````), this is where Kafka is installed, we will use the utilities located in the bin directory.
+  - Step 1: Open an SSH connection to your GCP Node.
+  - Step 2: Naviagte to the Kafka directory (````/opt/cloudera/parcels/CDH````), this is where Kafka is installed, we will use the utilities located in the bin directory.
 
     ````
-    cd /usr/hdf/current/kafka-broker/
+    cd /opt/cloudera/parcels/CDH
     ````
 
   - Step 3: Create a topic using the kafka-topics.sh script
     ````
-    bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic meetup_rsvp_raw
+    bin/kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic meetup_rsvp_raw
     ````
 
     NOTE: Based on how Kafka reports metrics topics with a period ('.') or underscore ('_') may collide with metric names and should be avoided. If they cannot be avoided, then you should only use one of them.
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --zookeeper demo.hortonworks.com:2181
+    bin/kafka-topics --list --zookeeper localhost:2181
     ````
 
 2. Testing Producers and Consumers
-  - Step 1: Open a second terminal to your EC2 node and navigate to the Kafka directory
+  - Step 1: Open a second terminal to your GCP node and navigate to the Kafka directory
   - In one shell window connect a consumer:
     ````
-    bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_rsvp_raw --from-beginning
+    bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic meetup_rsvp_raw --from-beginning
     ````
 
     Note: using –from-beginning will tell the broker we want to consume from the first message in the topic. Otherwise it will be from the latest offset.
 
   - In the second shell window connect a producer:
 ````
-bin/kafka-console-producer.sh --broker-list demo.hortonworks.com:6667 --topic meetup_rsvp_raw
+bin/kafka-console-producer --broker-list localhost:9092 --topic meetup_rsvp_raw
 ````
 - Sending messages. Now that the producer is  connected  we can type messages.
   - Type a message in the producer window
@@ -334,13 +342,13 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
     ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/publishkafka.png)
     
   - Step 3: Configure the topic and broker for the PublishKafka_*_0 processor,
-  where topic is meetup_rsvp_raw and broker is localhost:6667.
+  where topic is meetup_rsvp_raw and broker is localhost:9092.
 
 3. Start the NiFi flow
-4. In a terminal window to your EC2 node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_raw```` topic:
+4. In a terminal window to your GCP node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_raw```` topic:
 
     ````
-    bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_rsvp_raw --from-beginning
+    bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic meetup_rsvp_raw --from-beginning
     ````
 
 5. Messages should now appear in the consumer window.
@@ -352,16 +360,16 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 
 ## Integrating the Schema Registry
 1. Creating the topic
-  - Step 1: Open an SSH connection to your EC2 Node.
-  - Step 2: Naviagte to the Kafka directory (````/usr/hdf/current/kafka-broker````), this is where Kafka is installed, we will use the utilities located in the bin directory.
+  - Step 1: Open an SSH connection to your GCP Node.
+  - Step 2: Naviagte to the Kafka directory (````/opt/cloudera/parcels/CDH````), this is where Kafka is installed, we will use the utilities located in the bin directory.
 
     ````
-    cd /usr/hdf/current/kafka-broker/
+    cd /opt/cloudera/parcels/CDH/
     ````
 
-  - Step 3: Create a topic using the kafka-topics.sh script
+  - Step 3: Create a topic using the kafka-topics script
     ````
-    bin/kafka-topics.sh --create --zookeeper demo.hortonworks.com:2181 --replication-factor 1 --partitions 1 --topic meetup_rsvp_avro
+    bin/kafka-topics --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic meetup_rsvp_avro
 
     ````
 
@@ -369,7 +377,7 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 
   - Step 4:	Ensure the topic was created
     ````
-    bin/kafka-topics.sh --list --zookeeper demo.hortonworks.com:2181
+    bin/kafka-topics --list --zookeeper localhost:2181
     ````
 
 2. Adding the Schema to the Schema Registry
@@ -382,7 +390,7 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 
     ![Image](https://github.com/tspannhw/CDF-Workshop/raw/master/registry_quick_link.png)
 
-    or by going to ````http://<EC2_NODE>:7788/ui/#/
+    or by going to ````http://<GCP_NODE>:7788/ui/#/
     
   - Step 2: Create Meetup RSVP Schema in the Schema Registry
     1. Click on “+” button to add new schemas. A window called “Add New Schema” will appear.
@@ -446,10 +454,10 @@ Using the topic already created, meetup_rsvp_raw, we will publish from Apache Ni
 
 
 4. Start the NiFi flow
-5. In a terminal window to your EC2 node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_avro```` topic:
+5. In a terminal window to your GCP node and navigate to the Kafka directory and connect a consumer to the ````meetup_rsvp_avro```` topic:
 
     ````
-    bin/kafka-console-consumer.sh --bootstrap-server demo.hortonworks.com:6667 --topic meetup_rsvp_avro --from-beginning
+    bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic meetup_rsvp_avro --from-beginning
     ````
 
 5. Messages should now appear in the consumer window.
