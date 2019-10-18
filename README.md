@@ -25,7 +25,7 @@
 
 #### Available instances
 
-(https://docs.google.com/spreadsheets/d/16ugA0aju7f_s1uf1vj60DQ0wPqA2s5ZxqIZ_A4zV-kE/edit?usp=sharing)
+https://docs.google.com/spreadsheets/d/16ugA0aju7f_s1uf1vj60DQ0wPqA2s5ZxqIZ_A4zV-kE/edit?usp=sharing
 
 #### Login to Cloudera Manager
 
